@@ -1,6 +1,9 @@
+mod error_handler;
+mod compiler;
+
 use clap::Parser;
-use std::fs::File;
-use std::io::{self, Read, ErrorKind};
+use error_handler::ErrorHandler;
+use compiler::Compiler;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -9,23 +12,16 @@ struct Args {
     file: String,
 }
 
-fn main() -> io::Result<()> {
+fn main() {
     let args = Args::parse();
-
     let file_path = &args.file;
 
-    if !(file_path.ends_with(".xct") || file_path.ends_with(".exacta")) {
-        return Err(io::Error::new(
-            ErrorKind::InvalidInput,
-            "Invalid file extension: The file must have a .xct or .exacta extension.",
-        ));
+    match Compiler::process_file(file_path) {
+        Ok(code) => {
+            println!("Compiling Exacta code from file: {}\n\n{}", file_path, code);
+        }
+        Err(e) => {
+            ErrorHandler::handle_error(&e);
+        }
     }
-
-    let mut file = File::open(file_path)?;
-    let mut code = String::new();
-    file.read_to_string(&mut code)?;
-
-    println!("Compiling Exacta code from file: {}\n\n{}", file_path, code);
-
-    Ok(())
 }
