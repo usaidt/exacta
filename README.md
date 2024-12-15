@@ -1,2 +1,6 @@
-# exacta
-my own programming language for web
+# Exacta
+
+my own programming language for web development
+
+To Do:
+Make compiler
